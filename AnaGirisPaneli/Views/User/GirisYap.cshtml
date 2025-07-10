@@ -1,0 +1,21 @@
+﻿<form asp-action="GirisYap" method="post">
+
+    <!-- Mail Kutusu -->
+    <div class="mb-3">
+        <label for="exampleFormControlInput1" class="form-label">Mail Adresi</label>
+        <input type="email" class="form-control" style="width: 200px;" id="exampleFormControlInput1" name="mail">
+    </div>
+
+    <!-- Şifre Kutusu -->
+    <div class="mb-3">
+        <label for="inputPassword5" class="form-label">Şifre</label>
+        <input type="password" id="inputPassword5" class="form-control" style="width: 200px;" aria-describedby="passwordHelpBlock" name="sifre">
+        <div id="passwordHelpBlock" class="form-text">
+            <!-- İsteğe bağlı açıklama -->
+        </div>
+    </div>
+
+    <!-- Giriş Butonu -->
+    <button type="submit" class="btn btn-primary">Giriş Yap</button>
+    <a href="@Url.Action("KayitOl", "User")" class="btn btn-primary">Kayıt Ol</a>
+</form>
