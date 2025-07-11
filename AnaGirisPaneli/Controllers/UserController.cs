@@ -12,6 +12,8 @@ namespace AnaGirisPaneli.Controllers
         {
             _context = context;
         }
+
+        [HttpGet]
         public IActionResult KayitOl()
         {
             return View();
@@ -21,21 +23,23 @@ namespace AnaGirisPaneli.Controllers
         public IActionResult KayitOl(string Ad, string Sifre, string Mail, string Soyad)
         {
             var user = new Kullanici();
-            user.KMail = Mail;
+            user.Mail = Mail;
             user.Surname = Soyad;
-            user.Password = Sifre;
+            user.Password = SifreyiBase64le(Sifre);
             user.Name = Ad;
 
-            var mail = _context.Kullanicilar.Where(x => x.KMail == Mail).FirstOrDefault();
-            if(mail != null)
+            var mail = _context.Kullanicilar.Where(x => x.Mail == Mail).FirstOrDefault();
+            if (mail != null)
             {
-                throw new Exception("Böyle bir kullanıcı zaten kayıtlı");
+                ViewBag.Hata = "Böyle bir kullanıcı zaten kayıtlı!";
+                return View();
             }
+            else
+            {
             _context.Kullanicilar.Add(user);
             _context.SaveChanges();
-
-
             return RedirectToAction("GirisYap");
+            }
         }
 
         public IActionResult GirisYap()
@@ -43,22 +47,26 @@ namespace AnaGirisPaneli.Controllers
             return View();
         }
         [HttpPost]
-        public IActionResult GirisYap(string mail, string sifre)
+        public IActionResult GirisYap(string Mail, string Sifre)
         {
-            var kullanici1 = _context.Kullanicilar.Where(k => k.KMail == mail && k.Password == sifre).FirstOrDefault();
-            if(kullanici1 != null) { throw new Exception("Böyle Bir Kullanıcı Bulunamadı"); }
+            var kullanici1 = _context.Kullanicilar.FirstOrDefault(k => k.Mail == Mail);
+
+            if (kullanici1 == null){ViewBag.Hata = "Böyle bir kullanıcı bulunamadı.";return View();}
+            //var hashed = SifreyiBase64le(Sifre);
+
+            if (kullanici1.Password != SifreyiBase64le(Sifre))
+            {
+                ViewBag.Hata = "Şifre hatalı.";
+                return View();
+            }
+                
+            // Giriş 
             return RedirectToAction("Welcome");
 
         }
-        [HttpPost]
-        public IActionResult KayitOl(Kullanici model)
-        {
-            // Kayıt işlemleri...
-            return RedirectToAction("GirisYap");
-        }
 
 
-        public IActionResult welcome()
+        public IActionResult Welcome()
         {
             return View();
         }
@@ -66,8 +74,13 @@ namespace AnaGirisPaneli.Controllers
         //[HttpPost]
         //public IActionResult welcome()
         //{
-            
+
         //}
-        
+        public static string SifreyiBase64le(string Sifre)
+        {
+            byte[] bytes = Encoding.UTF8.GetBytes(Sifre);
+            return Convert.ToBase64String(bytes);
+        }
     }
 }
+    
